@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-tauri-in-the-browser",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Vite dev plugin that proxies Tauri API calls from remote browsers through a leader WebView",
   "type": "module",
   "main": "./dist/index.js",

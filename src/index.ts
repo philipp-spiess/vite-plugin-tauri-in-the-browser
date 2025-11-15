@@ -2,7 +2,12 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { Connect, Plugin } from "vite";
 import { WebSocketServer, type WebSocket, type RawData } from "ws";
-import { parseMessage, type ClientRole, type ProxyMessage, type RpcRequest } from "./protocol.js";
+import {
+  parseMessage,
+  type ClientRole,
+  type ProxyMessage,
+  type RpcRequest,
+} from "./protocol.js";
 
 export interface TauriLeaderProxyOptions {
   path?: string;
@@ -39,6 +44,23 @@ export default function tauriLeaderProxy(options: TauriLeaderProxyOptions = {}):
 
   let leader: LeaderConnection | null = null;
   const followers = new Map<string, ConnectedFollower>();
+
+  const notifyLeaderFollowerStatus = (clientId: string, status: "disconnected") => {
+    if (!leader) {
+      return;
+    }
+    try {
+      leader.socket.send(
+        JSON.stringify({
+          type: "follower-status",
+          clientId,
+          status,
+        })
+      );
+    } catch (error) {
+      log("failed notifying leader of follower status", error);
+    }
+  };
 
   const sendNoLeader = (socket: WebSocket, msg: RpcRequest) => {
     socket.send(
@@ -110,6 +132,7 @@ export default function tauriLeaderProxy(options: TauriLeaderProxyOptions = {}):
           }
           if (role === "follower" && clientId) {
             followers.delete(clientId);
+            notifyLeaderFollowerStatus(clientId, "disconnected");
           }
         });
 
@@ -118,6 +141,9 @@ export default function tauriLeaderProxy(options: TauriLeaderProxyOptions = {}):
             role = msg.role;
             clientId = msg.clientId;
             if (msg.role === "leader") {
+              if (clientId) {
+                followers.delete(clientId);
+              }
               leader?.socket.close();
               leader = { clientId: msg.clientId, socket: ws };
               log("leader registered", msg.clientId);
@@ -149,6 +175,43 @@ export default function tauriLeaderProxy(options: TauriLeaderProxyOptions = {}):
               return;
             }
             target.socket.send(JSON.stringify(msg));
+            return;
+          }
+
+          if (msg.type === "callback-register" && role === "follower") {
+            if (!leader) {
+              return;
+            }
+            tryForwardToLeader(msg);
+            return;
+          }
+
+          if (msg.type === "callback-unregister" && role === "follower") {
+            if (!leader) {
+              return;
+            }
+            tryForwardToLeader(msg);
+            return;
+          }
+
+          if (msg.type === "callback-run" && role === "leader") {
+            const target = followers.get(msg.to);
+            if (!target) {
+              log("callback target missing", msg.to);
+              return;
+            }
+            target.socket.send(JSON.stringify(msg));
+          }
+        };
+
+        const tryForwardToLeader = (payload: ProxyMessage) => {
+          if (!leader) {
+            return;
+          }
+          try {
+            leader.socket.send(JSON.stringify(payload));
+          } catch (error) {
+            log("failed forwarding payload to leader", error);
           }
         };
       });
@@ -167,7 +230,7 @@ export default function tauriLeaderProxy(options: TauriLeaderProxyOptions = {}):
               type: "module",
               src: `/@tauri-leader/runtime`,
             },
-            injectTo: "body",
+            injectTo: "head-prepend",
           },
         ],
       };
