@@ -1,3 +1,5 @@
+![Example screenshot](./example.png)
+
 # vite-plugin-tauri-in-the-browser
 
 Let any browser borrow Tauri powers. This dev-only Vite plugin spins up a WebSocket switchboard that shares a single "leader" Tauri WebView with unlimited follower browsers so they can call `@tauri-apps/api` without native access.
