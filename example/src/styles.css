@@ -1,0 +1,131 @@
+:root {
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono",
+    monospace;
+  line-height: 1.4;
+  font-weight: 400;
+  color: #eee;
+  background-color: #030303;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: inherit;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+#console {
+  width: min(100%, 960px);
+  display: flex;
+  flex-direction: column;
+}
+
+.console-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.console-title {
+  font-size: 1.2rem;
+}
+
+.console-subtitle {
+  font-size: 0.8rem;
+}
+
+.status-block {
+  text-align: right;
+}
+
+.status-label {
+  display: block;
+  font-size: 0.7rem;
+}
+
+.status-value {
+  font-size: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.module {
+  border: 1px solid #1b251f;
+  padding: 1rem;
+  background: #020202;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: inset 0 0 12px #000;
+}
+
+.module-title {
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+button {
+  font-family: inherit;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  background: #050505;
+  color: white;
+  border: 1px solid white;
+  padding: 0.7rem 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: wait;
+}
+
+button:hover:not(:disabled) {
+  background: #0d1f15;
+}
+
+pre {
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid white;
+  min-height: 160px;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: white;
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 1rem;
+  }
+
+  .console-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-block {
+    text-align: left;
+  }
+}

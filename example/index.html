@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tauri RPC Console</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+
+  <body>
+    <main id="console">
+      <section class="grid">
+        <article class="module">
+          <div class="module-title">COMMAND › list_home_files</div>
+          <button id="list-files">RUN COMMAND</button>
+          <pre id="files-output" aria-live="polite"></pre>
+        </article>
+        <article class="module">
+          <div class="module-title">EVENT › cpu-usage</div>
+          <div class="status-row">
+            <span>stream</span>
+            <span id="event-status">connecting…</span>
+          </div>
+          <pre id="cpu-panel"></pre>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
